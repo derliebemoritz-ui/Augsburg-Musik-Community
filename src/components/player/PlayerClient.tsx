@@ -118,17 +118,15 @@ export default function PlayerClient({
     }
   }, [refreshCurrent, serverNow]);
 
-  function handlePlay() {
-    // Play (egal ob Erststart oder nach Pause) steigt immer an der aktuell
-    // live laufenden Stelle ein - wie echtes Radio.
-    playLive();
-  }
-
-  function handlePause() {
+  function handlePlayPause() {
     const audio = audioRef.current;
-    if (!audio) return;
-    audio.pause();
-    setIsPlaying(false);
+    if (isPlaying && audio) {
+      audio.pause();
+      setIsPlaying(false);
+      return;
+    }
+    // Wieder-Einsteigen folgt derselben Live-Radio-Logik wie der erste Start.
+    playLive();
   }
 
   function handleSkip() {
@@ -298,18 +296,10 @@ export default function PlayerClient({
 
           <div className="flex items-center justify-center gap-3">
             <button
-              onClick={handlePlay}
-              disabled={isPlaying}
-              className="border-2 border-ink bg-ink px-5 py-2 text-sm font-bold uppercase tracking-wide text-page hover:bg-surface-alt hover:text-ink disabled:opacity-40"
+              onClick={handlePlayPause}
+              className="border-2 border-ink bg-ink px-5 py-2 text-sm font-bold uppercase tracking-wide text-page hover:bg-surface-alt hover:text-ink"
             >
-              {hasStarted ? "Weiter" : "Play"}
-            </button>
-            <button
-              onClick={handlePause}
-              disabled={!isPlaying}
-              className="border-2 border-ink px-5 py-2 text-sm font-bold uppercase tracking-wide text-ink hover:bg-ink hover:text-page disabled:opacity-40"
-            >
-              Pause
+              {isPlaying ? "Pause" : hasStarted ? "Weiter" : "Play"}
             </button>
             <button
               onClick={handleSkip}
