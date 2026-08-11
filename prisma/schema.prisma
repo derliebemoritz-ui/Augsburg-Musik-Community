@@ -1,0 +1,141 @@
+// Datenmodell fuer das Augsburg Musik Community Webradio.
+// SQLite als Datei-Datenbank, siehe README.md fuer Setup/Migrationen.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Artist {
+  id        String   @id @default(cuid())
+  name      String
+  photoPath String? // Pfad im Storage-Backend, siehe src/lib/storage.ts
+  bio       String   @default("")
+  musicLink String // "Hier geht's zur Musik" - z.B. Spotify/Bandcamp/Website
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  albums Album[]
+  tracks Track[]
+
+  @@index([name])
+}
+
+model Album {
+  id          String   @id @default(cuid())
+  title       String
+  artworkPath String?
+  artistId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  artist Artist  @relation(fields: [artistId], references: [id], onDelete: Restrict)
+  tracks Track[]
+
+  @@index([artistId])
+}
+
+model Genre {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tracks          Track[]
+  scheduleBlocks  ScheduleBlock[]
+}
+
+model Track {
+  id               String   @id @default(cuid())
+  title            String
+  audioPath        String
+  durationSeconds  Int      @default(0)
+  artistId         String
+  albumId          String
+  genreId          String
+  uploadedAt       DateTime @default(now())
+  active           Boolean  @default(true)
+
+  // Manueller Sanktions-Multiplikator (Admin), Basiswert 1.0
+  sanctionMultiplier Float @default(1.0)
+
+  // Rechte-Einverstaendnis - Pflichtfelder
+  consentGiven Boolean   @default(false)
+  consentDate  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Restrict)
+  album  Album  @relation(fields: [albumId], references: [id], onDelete: Restrict)
+  genre  Genre  @relation(fields: [genreId], references: [id], onDelete: Restrict)
+
+  scheduleItems ScheduleItem[]
+  playEvents    PlayEvent[]
+
+  @@index([artistId])
+  @@index([albumId])
+  @@index([genreId])
+  @@index([active])
+}
+
+// Ein 2-Stunden-Block im Sendeplan eines Tages, einem Genre zugeordnet.
+model ScheduleBlock {
+  id        String   @id @default(cuid())
+  date      DateTime // Tagesanker (Mitternacht Europe/Berlin), identifiziert den Sendetag
+  blockIndex Int     // 0..11 (12 Bloecke a 2h pro Tag)
+  genreId   String
+  startTime DateTime
+  endTime   DateTime
+  // true, wenn das urspruenglich ausgeloste Genre keine Tracks hatte und
+  // auf ein anderes Genre mit verfuegbaren Tracks ausgewichen wurde
+  isFallbackGenre Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  genre Genre          @relation(fields: [genreId], references: [id], onDelete: Restrict)
+  items ScheduleItem[]
+
+  @@unique([date, blockIndex])
+  @@index([startTime])
+}
+
+// Ein einzelner Track-Slot im Sendeplan. Dient gleichzeitig als geplante UND
+// (nach dem tatsaechlichen Abspielen) als tatsaechliche Sende-Historie.
+model ScheduleItem {
+  id           String    @id @default(cuid())
+  blockId      String
+  trackId      String
+  position     Int // Reihenfolge innerhalb des Blocks, 0-basiert
+  scheduledStart DateTime
+  scheduledEnd   DateTime
+  actualStart    DateTime? // gesetzt, sobald der Slot tatsaechlich erreicht wurde
+  createdAt      DateTime  @default(now())
+
+  block ScheduleBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  track Track         @relation(fields: [trackId], references: [id], onDelete: Restrict)
+
+  @@unique([blockId, position])
+  @@index([trackId])
+  @@index([scheduledStart])
+}
+
+// Anonyme, aggregierte Wiedergabe-Statistik. Keine personenbezogenen Daten,
+// keine IP-Adressen, keine Cookies zur Wiedererkennung.
+model PlayEvent {
+  id              String   @id @default(cuid())
+  trackId         String
+  playedAt        DateTime @default(now())
+  listenedSeconds Int
+  completed       Boolean // true = komplett zu Ende gehoert
+  skipped         Boolean // true = geskippt (lokal, betrifft nur die eigene Session)
+  createdAt       DateTime @default(now())
+
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@index([trackId])
+  @@index([playedAt])
+}

@@ -1,0 +1,46 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    volumes:
+      - musikradio-data:/data
+    expose:
+      - "3000"
+
+  # Generiert stündlich den Sendeplan für den kommenden Tag vor (idempotent -
+  # tut nichts, falls bereits vorhanden). Reine Vorsichtsmaßnahme: Die
+  # Anwendung generiert den Plan bei Bedarf ohnehin automatisch beim ersten
+  # Seitenaufruf des Tages (siehe README, Abschnitt Sendeplan).
+  scheduler:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - app
+    env_file:
+      - .env.production
+    volumes:
+      - musikradio-data:/data
+    entrypoint: []
+    command: >
+      sh -c "while true; do npm run db:generate-schedule; sleep 3600; done"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+
+volumes:
+  musikradio-data:
+    name: musikradio_data
+  caddy-data:
+  caddy-config:

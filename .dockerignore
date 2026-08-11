@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+storage
+*.db
+*.db-journal
+.env
+.env.production
+backups
+/tmp

@@ -1,0 +1,15 @@
+# Caddy-Konfiguration für das Stadtradio.
+# Domain vor dem Deployment anpassen (siehe README.md). Caddy holt und
+# erneuert das HTTPS-Zertifikat (Let's Encrypt) danach automatisch.
+
+radio.beispiel-domain.de {
+	reverse_proxy app:3000
+
+	encode gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000;"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
