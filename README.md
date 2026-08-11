@@ -111,6 +111,21 @@ Tracks vorher umverteilen oder löschen.
   Hörer:innen-Session – der gemeinsame Sendeplan und die öffentliche
   Historie bleiben davon unberührt (echtes Live-Radio-Prinzip: beim Öffnen
   der Seite steigt man immer beim tatsächlich laufenden Song ein).
+- Verweist der gerade fällige Slot auf einen inzwischen gelöschten Track,
+  springt die Wiedergabe automatisch zum nächsten abspielbaren Slot vor
+  (läuft dann sofort ab Anfang) – es entsteht nie eine Sendepause, solange
+  irgendwo später am Tag noch ein gültiger Track eingeplant ist.
+
+**Zwei Regenerier-Buttons unter `/admin/schedule`:**
+
+- **"Rest von heute reparieren"**: würfelt nur noch nicht begonnene Blöcke
+  des heutigen Tages neu und füllt zusätzlich tote Zukunfts-Slots im
+  gerade laufenden Block auf (z.B. nachdem mehrere Tracks gelöscht
+  wurden). Bereits Gelaufenes bleibt für die Historie unangetastet. Ein
+  Hinweisbanner zeigt an, wenn und wie viele bevorstehende Slots betroffen
+  sind.
+- **"Plan für morgen neu generieren"**: betrifft ausschließlich den
+  kommenden Sendetag, nie den heutigen.
 
 ## Gewichtungs-Konstanten ändern
 
