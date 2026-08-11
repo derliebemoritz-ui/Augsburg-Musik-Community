@@ -2,20 +2,25 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { regenerateNextDaySchedule } from "@/lib/actions/schedule";
+import type { ActionResult } from "@/lib/actions/shared";
 
-export default function RegenerateButton({ hasTomorrowSchedule }: { hasTomorrowSchedule: boolean }) {
+export default function RegenerateButton({
+  label,
+  confirmText,
+  action,
+}: {
+  label: string;
+  confirmText: string;
+  action: () => Promise<ActionResult<{ blocksCreated: number }>>;
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   function handleClick() {
-    const message = hasTomorrowSchedule
-      ? "Der Sendeplan für morgen existiert bereits und wird komplett neu gewürfelt. Fortfahren?"
-      : "Sendeplan für morgen jetzt generieren?";
-    if (!confirm(message)) return;
+    if (!confirm(confirmText)) return;
 
     startTransition(async () => {
-      const result = await regenerateNextDaySchedule();
+      const result = await action();
       if (!result.ok) {
         alert(result.error);
         return;
@@ -30,7 +35,7 @@ export default function RegenerateButton({ hasTomorrowSchedule }: { hasTomorrowS
       disabled={isPending}
       className="border border-line bg-surface px-4 py-2 text-sm font-medium text-ink hover:border-cyan disabled:opacity-50"
     >
-      {isPending ? "Wird generiert…" : "Plan für morgen neu generieren"}
+      {isPending ? "Wird generiert…" : label}
     </button>
   );
 }

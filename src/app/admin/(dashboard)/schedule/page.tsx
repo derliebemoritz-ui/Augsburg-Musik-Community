@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { getServiceDate, addServiceDays } from "@/lib/scheduling/time";
+import { regenerateNextDaySchedule, regenerateTodaySchedule } from "@/lib/actions/schedule";
 import RegenerateButton from "./RegenerateButton";
 
 function formatTime(date: Date): string {
@@ -20,14 +21,49 @@ async function loadBlocks(date: Date) {
 export default async function AdminSchedulePage() {
   const today = getServiceDate();
   const tomorrow = addServiceDays(today, 1);
-  const [todayBlocks, tomorrowBlocks] = await Promise.all([loadBlocks(today), loadBlocks(tomorrow)]);
+  const now = new Date();
+  const [todayBlocks, tomorrowBlocks, deadUpcomingToday] = await Promise.all([
+    loadBlocks(today),
+    loadBlocks(tomorrow),
+    prisma.scheduleItem.count({
+      where: { block: { date: today }, scheduledStart: { gt: now }, trackId: null },
+    }),
+  ]);
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold text-ink">Sendeplan</h1>
-        <RegenerateButton hasTomorrowSchedule={tomorrowBlocks.length > 0} />
+        <div className="flex flex-wrap gap-3">
+          <RegenerateButton
+            label="Rest von heute reparieren"
+            confirmText={
+              deadUpcomingToday > 0
+                ? `${deadUpcomingToday} noch bevorstehende(r) Slot(s) heute verweisen auf gelöschte Tracks. Nur diese noch nicht begonnenen Blöcke werden neu gewürfelt - bereits Gelaufenes/gerade Laufendes bleibt unangetastet. Fortfahren?`
+                : "Noch nicht begonnene Blöcke des heutigen Tages neu würfeln? Bereits Gelaufenes/gerade Laufendes bleibt unangetastet."
+            }
+            action={regenerateTodaySchedule}
+          />
+          <RegenerateButton
+            label="Plan für morgen neu generieren"
+            confirmText={
+              tomorrowBlocks.length > 0
+                ? "Der Sendeplan für morgen existiert bereits und wird komplett neu gewürfelt. Fortfahren?"
+                : "Sendeplan für morgen jetzt generieren?"
+            }
+            action={regenerateNextDaySchedule}
+          />
+        </div>
       </div>
+
+      {deadUpcomingToday > 0 && (
+        <p className="mb-6 border border-yellow bg-surface px-3 py-2 text-sm text-ink-muted">
+          {deadUpcomingToday} noch bevorstehende(r) Sendeplan-Slot(s) heute verweisen auf
+          inzwischen gelöschte Tracks (unten als „(gelöscht)“ markiert) und werden beim Abspielen
+          übersprungen. Mit „Rest von heute reparieren“ oben lassen sie sich durch frisch
+          gewürfelte Tracks ersetzen.
+        </p>
+      )}
 
       <section className="mb-10">
         <h2 className="mb-3 text-lg font-medium text-ink">Heute</h2>

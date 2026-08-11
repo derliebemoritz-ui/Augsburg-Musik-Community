@@ -4,6 +4,7 @@ import { computeRankingSets, computeTrackWeight } from "./weighting";
 import { computePlayStatsMap } from "./stats";
 import { shuffle, weightedShuffle } from "./random";
 import { EmptyLibraryError, AlreadyAiredError } from "./errors";
+import { getServiceDate } from "./time";
 import type { Album, Artist, Genre, Track } from "@/generated/prisma/client";
 
 export const BLOCKS_PER_DAY = Math.floor((24 * 60) / scheduleConfig.blockDurationMinutes);
@@ -85,13 +86,16 @@ function fillBlock(
   return items;
 }
 
-/**
- * Generiert den Sendeplan für einen Sendetag (siehe `getServiceDate`).
- * Setzt fort, wo der zuletzt geplante Track endet (kein Overlap/keine
- * Lücke), falls für einen früheren Tag bereits über Mitternacht hinaus
- * geplant wurde.
- */
-export async function generateDaySchedule(serviceDate: Date): Promise<GenerateResult> {
+type SchedulingContext = {
+  genres: Genre[];
+  tracksByGenre: Map<string, PoolTrack[]>;
+  genresWithTracks: Genre[];
+  weights: Map<string, number>;
+};
+
+/** Lädt Genres, aktive/freigegebene Tracks und deren aktuelle Gewichtung -
+ *  gemeinsame Grundlage für alle Generierungs-/Auffüll-Funktionen. */
+async function buildSchedulingContext(): Promise<SchedulingContext> {
   const genres = await prisma.genre.findMany();
   const tracks = (await prisma.track.findMany({
     where: { active: true, consentGiven: true },
@@ -118,7 +122,28 @@ export async function generateDaySchedule(serviceDate: Date): Promise<GenerateRe
     throw new EmptyLibraryError();
   }
 
-  const genreSequence = buildGenreSequence(genres, BLOCKS_PER_DAY);
+  return { genres, tracksByGenre, genresWithTracks, weights };
+}
+
+/**
+ * Generiert `blockCount` Blöcke für einen Sendetag, beginnend bei
+ * `startBlockIndex` (z.B. 0 für den ganzen Tag, oder ein späterer Index,
+ * um nur das Ende eines bereits teilweise bestehenden Tages aufzufüllen).
+ * Setzt fort, wo der zuletzt geplante Track endet (kein Overlap/keine
+ * Lücke), falls bereits über Mitternacht hinaus geplant wurde.
+ */
+async function generateBlocks(
+  serviceDate: Date,
+  startBlockIndex: number,
+  blockCount: number
+): Promise<GenerateResult> {
+  if (blockCount <= 0) {
+    return { blocksCreated: 0, blocksSkipped: 0 };
+  }
+
+  const { genres, tracksByGenre, genresWithTracks, weights } = await buildSchedulingContext();
+
+  const genreSequence = buildGenreSequence(genres, blockCount);
 
   const latestExisting = await prisma.scheduleItem.findFirst({
     orderBy: { scheduledEnd: "desc" },
@@ -137,8 +162,9 @@ export async function generateDaySchedule(serviceDate: Date): Promise<GenerateRe
     items: FilledItem[];
   }[] = [];
 
-  for (let blockIndex = 0; blockIndex < BLOCKS_PER_DAY; blockIndex++) {
-    const intendedGenre = genreSequence[blockIndex];
+  for (let i = 0; i < blockCount; i++) {
+    const blockIndex = startBlockIndex + i;
+    const intendedGenre = genreSequence[i];
     let genre = intendedGenre;
     let pool = tracksByGenre.get(intendedGenre.id) ?? [];
     let isFallbackGenre = false;
@@ -196,8 +222,13 @@ export async function generateDaySchedule(serviceDate: Date): Promise<GenerateRe
 
   return {
     blocksCreated: blocksToCreate.length,
-    blocksSkipped: BLOCKS_PER_DAY - blocksToCreate.length,
+    blocksSkipped: blockCount - blocksToCreate.length,
   };
+}
+
+/** Generiert den kompletten Sendeplan (alle Blöcke) für einen Sendetag. */
+export async function generateDaySchedule(serviceDate: Date): Promise<GenerateResult> {
+  return generateBlocks(serviceDate, 0, BLOCKS_PER_DAY);
 }
 
 /** Generiert den Sendeplan für `serviceDate` nur, falls noch keiner existiert. */
@@ -226,4 +257,110 @@ export async function regenerateSchedule(serviceDate: Date): Promise<GenerateRes
 
   await prisma.scheduleBlock.deleteMany({ where: { date: serviceDate } });
   return generateDaySchedule(serviceDate);
+}
+
+/**
+ * Füllt den gerade laufenden Block auf, falls seine noch nicht erreichten
+ * (zukünftigen) Slots auf gelöschte Tracks verweisen: diese werden entfernt
+ * und durch frisch gewürfelte Tracks desselben Genres ersetzt, bis der
+ * Block wieder seine ursprüngliche Zielspieldauer erreicht. Bereits
+ * gelaufene/gerade laufende Items bleiben unangetastet. Tut nichts, wenn
+ * der laufende Block keine toten Zukunfts-Slots hat.
+ */
+async function refillCurrentBlockIfNeeded(today: Date, now: Date): Promise<void> {
+  const currentBlock = await prisma.scheduleBlock.findFirst({
+    where: { date: today, startTime: { lte: now } },
+    orderBy: { startTime: "desc" },
+  });
+  if (!currentBlock) return;
+
+  const deadFutureInBlock = await prisma.scheduleItem.count({
+    where: { blockId: currentBlock.id, scheduledStart: { gt: now }, trackId: null },
+  });
+  if (deadFutureInBlock === 0) return;
+
+  await prisma.scheduleItem.deleteMany({
+    where: { blockId: currentBlock.id, scheduledStart: { gt: now } },
+  });
+
+  const lastRemaining = await prisma.scheduleItem.findFirst({
+    where: { blockId: currentBlock.id },
+    orderBy: { position: "desc" },
+  });
+  const cursor = lastRemaining ? lastRemaining.scheduledEnd : now;
+  const elapsedMs = cursor.getTime() - currentBlock.startTime.getTime();
+  const remainingMs = scheduleConfig.blockDurationMinutes * 60_000 - elapsedMs;
+  if (remainingMs <= 0) return;
+
+  let context: SchedulingContext;
+  try {
+    context = await buildSchedulingContext();
+  } catch (err) {
+    if (err instanceof EmptyLibraryError) return; // Lücke bleibt, Laufzeit-Fix übernimmt
+    throw err;
+  }
+
+  let pool = context.tracksByGenre.get(currentBlock.genreId) ?? [];
+  if (pool.length === 0) {
+    // Genre des laufenden Blocks bewusst nicht ändern (Anzeige "Jetzt: X"
+    // bliebe sonst inkonsistent zur bereits gelaufenen Hälfte) - stattdessen
+    // mit einem anderen Genre auffüllen, dessen Pool noch Tracks hat.
+    if (context.genresWithTracks.length === 0) return;
+    const fallback =
+      context.genresWithTracks[Math.floor(Math.random() * context.genresWithTracks.length)];
+    pool = context.tracksByGenre.get(fallback.id) ?? [];
+  }
+  if (pool.length === 0) return;
+
+  const items = fillBlock(pool, context.weights, cursor, remainingMs);
+  if (items.length === 0) return;
+
+  const startPosition = (lastRemaining?.position ?? -1) + 1;
+  await prisma.scheduleItem.createMany({
+    data: items.map((item, i) => ({
+      blockId: currentBlock.id,
+      trackId: item.track.id,
+      trackTitle: item.track.title,
+      artistName: item.track.artist.name,
+      albumTitle: item.track.album.title,
+      position: startPosition + i,
+      scheduledStart: item.scheduledStart,
+      scheduledEnd: item.scheduledEnd,
+    })),
+  });
+
+  const newBlockEnd = items[items.length - 1].scheduledEnd;
+  if (newBlockEnd > currentBlock.endTime) {
+    await prisma.scheduleBlock.update({
+      where: { id: currentBlock.id },
+      data: { endTime: newBlockEnd },
+    });
+  }
+}
+
+/**
+ * Erzeugt fehlende Blöcke für den REST des heutigen Sendetags neu
+ * (Admin-Funktion "Sendeplan für heute reparieren/auffüllen"). Anders als
+ * `regenerateSchedule` wird dabei nichts Bereits-Gelaufenes gelöscht:
+ * Zunächst wird der gerade laufende Block aufgefüllt, falls er tote
+ * Zukunfts-Slots enthält (siehe `refillCurrentBlockIfNeeded`), danach
+ * werden alle noch nicht begonnenen Blöcke neu gewürfelt. Historie und
+ * aktuelle Wiedergabe bleiben unangetastet. Nützlich z.B. wenn durch
+ * gelöschte Tracks Lücken im weiteren Tagesverlauf entstanden sind.
+ */
+export async function regenerateRemainingToday(): Promise<GenerateResult> {
+  const today = getServiceDate();
+  const now = new Date();
+
+  await refillCurrentBlockIfNeeded(today, now);
+
+  await prisma.scheduleBlock.deleteMany({ where: { date: today, startTime: { gt: now } } });
+
+  const lastPreserved = await prisma.scheduleBlock.findFirst({
+    where: { date: today },
+    orderBy: { blockIndex: "desc" },
+  });
+  const nextBlockIndex = lastPreserved ? lastPreserved.blockIndex + 1 : 0;
+
+  return generateBlocks(today, nextBlockIndex, BLOCKS_PER_DAY - nextBlockIndex);
 }

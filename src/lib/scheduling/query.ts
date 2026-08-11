@@ -23,12 +23,17 @@ export async function getCurrentScheduleItem(
 ): Promise<CurrentScheduleItem | null> {
   const findCurrent = () =>
     prisma.scheduleItem.findFirst({
-      // trackId kann null sein, falls der Track inzwischen gelöscht wurde -
-      // ein solcher Slot ist nicht abspielbar und wird wie "kein Programm"
-      // behandelt (siehe README, Abschnitt Fehlerbehandlung).
-      where: { scheduledStart: { lte: now }, scheduledEnd: { gt: now }, trackId: { not: null } },
+      where: { scheduledStart: { lte: now }, scheduledEnd: { gt: now } },
       include: trackInclude,
       orderBy: { scheduledStart: "desc" },
+    });
+
+  /** Sucht den nächsten abspielbaren Eintrag ab `from` (trackId not null). */
+  const findNextPlayable = (from: Date) =>
+    prisma.scheduleItem.findFirst({
+      where: { scheduledStart: { gte: from }, trackId: { not: null } },
+      include: trackInclude,
+      orderBy: { scheduledStart: "asc" },
     });
 
   let item = await findCurrent();
@@ -43,6 +48,14 @@ export async function getCurrentScheduleItem(
       throw err;
     }
     item = await findCurrent();
+  }
+
+  // Der Slot, der genau jetzt laufen sollte, hat keinen Track mehr (z.B.
+  // gelöscht) - statt "kein Programm" anzuzeigen, direkt zum nächsten
+  // abspielbaren Track vorspulen (der dann sofort ab Anfang läuft), damit
+  // gelöschte Tracks nie eine Sendelücke verursachen.
+  if (!item || !item.trackId) {
+    item = await findNextPlayable(item ? item.scheduledEnd : now);
   }
 
   if (item && !item.actualStart) {
