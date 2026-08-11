@@ -74,9 +74,20 @@ Datenbank-Eingriffe nötig:
    bekommen unter `/admin/tracks` einen **Sanktions-Multiplikator**
    (Default 1.0 – kleiner als 1 heißt "seltener spielen").
 
-Bereits gestartete/gespielte Sendeplan-Einträge verhindern das Löschen von
-Künstler:innen/Alben/Genres/Tracks, die darin vorkommen (Datenintegrität der
-Historie). Stattdessen: Track auf "inaktiv" setzen.
+**Tracks löschen:** Ein Track lässt sich in seiner Detailansicht
+(`/admin/tracks/<id>`) jederzeit endgültig löschen – auch wenn er bereits
+im Sendeplan oder in der Play-Historie vorkam. Datenbank-Eintrag und
+Audiodatei werden dabei entfernt; Titel, Künstler:in und Album bleiben in
+Historie, Statistik und CSV-Export als Text erhalten, nur die Verknüpfung
+zum (dann nicht mehr existierenden) Track verschwindet. War der Track noch
+für die Zukunft eingeplant, werden diese Slots beim Abspielen automatisch
+übersprungen. Vor dem Löschen erscheint eine Sicherheitsabfrage, die genau
+das erklärt. Für ein nur vorübergehendes Entfernen aus der Rotation eignet
+sich stattdessen der Aktiv/Inaktiv-Schalter besser.
+
+Künstler:innen/Alben/Genres lassen sich dagegen nur löschen, wenn ihnen
+aktuell kein Track mehr zugeordnet ist (Datenintegrität des Katalogs) –
+Tracks vorher umverteilen oder löschen.
 
 ## Die Sendeplan-Logik
 
