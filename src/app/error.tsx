@@ -3,17 +3,15 @@
 export default function RootError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <div className="flex flex-1 items-center justify-center px-4">
-      <div className="max-w-md rounded-lg border border-neutral-300 bg-white p-8 text-center">
-        <h1 className="mb-2 text-lg font-semibold text-neutral-900">
-          Puh, da ist etwas schiefgelaufen
-        </h1>
-        <p className="mb-4 text-sm text-neutral-600">
+      <div className="max-w-md border border-line bg-surface p-8 text-center">
+        <h1 className="mb-2 text-lg font-bold text-ink">Fehler</h1>
+        <p className="mb-4 text-sm text-ink-muted">
           Das Radio ist gerade nicht erreichbar. Bitte versuche es in ein paar Minuten noch
           einmal.
         </p>
         <button
           onClick={reset}
-          className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+          className="border-2 border-ink bg-ink px-4 py-2 text-sm font-bold uppercase tracking-wide text-page hover:bg-surface-alt hover:text-ink"
         >
           Erneut versuchen
         </button>

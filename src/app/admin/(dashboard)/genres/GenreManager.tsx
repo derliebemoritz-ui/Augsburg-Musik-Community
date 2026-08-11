@@ -64,12 +64,12 @@ export default function GenreManager({ initialGenres }: { initialGenres: Genre[]
   return (
     <div className="max-w-xl">
       {error && (
-        <p className="mb-4 rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mb-4 border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
           {error}
         </p>
       )}
 
-      <ul className="mb-6 divide-y divide-neutral-200 rounded-lg border border-neutral-300 bg-white">
+      <ul className="mb-6 divide-y divide-line border border-line bg-surface">
         {genres.map((genre) => (
           <li key={genre.id} className="flex items-center justify-between gap-3 px-4 py-3">
             {editingId === genre.id ? (
@@ -78,12 +78,12 @@ export default function GenreManager({ initialGenres }: { initialGenres: Genre[]
                 value={editingName}
                 onChange={(e) => setEditingName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleRename(genre.id)}
-                className="flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+                className="flex-1 border border-line px-2 py-1 text-sm"
               />
             ) : (
-              <span className="text-sm text-neutral-800">
+              <span className="text-sm text-ink">
                 {genre.name}{" "}
-                <span className="text-neutral-400">
+                <span className="text-ink-muted">
                   ({genre.trackCount} Track{genre.trackCount === 1 ? "" : "s"})
                 </span>
               </span>
@@ -94,11 +94,11 @@ export default function GenreManager({ initialGenres }: { initialGenres: Genre[]
                   <button
                     disabled={isPending}
                     onClick={() => handleRename(genre.id)}
-                    className="text-cyan-700 hover:underline"
+                    className="text-cyan hover:underline"
                   >
                     Speichern
                   </button>
-                  <button onClick={() => setEditingId(null)} className="text-neutral-500 hover:underline">
+                  <button onClick={() => setEditingId(null)} className="text-ink-muted hover:underline">
                     Abbrechen
                   </button>
                 </>
@@ -109,7 +109,7 @@ export default function GenreManager({ initialGenres }: { initialGenres: Genre[]
                       setEditingId(genre.id);
                       setEditingName(genre.name);
                     }}
-                    className="text-neutral-600 hover:underline"
+                    className="text-ink-muted hover:underline"
                   >
                     Umbenennen
                   </button>
@@ -126,7 +126,7 @@ export default function GenreManager({ initialGenres }: { initialGenres: Genre[]
           </li>
         ))}
         {genres.length === 0 && (
-          <li className="px-4 py-6 text-center text-sm text-neutral-500">
+          <li className="px-4 py-6 text-center text-sm text-ink-muted">
             Noch keine Genres angelegt.
           </li>
         )}
@@ -137,12 +137,12 @@ export default function GenreManager({ initialGenres }: { initialGenres: Genre[]
           value={newName}
           onChange={(e) => setNewName(e.target.value)}
           placeholder="Neues Genre, z.B. Jazz"
-          className="flex-1 rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="flex-1 border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
         <button
           type="submit"
           disabled={isPending || newName.trim().length === 0}
-          className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50"
+          className="bg-ink px-4 py-2 text-sm font-medium text-page hover:bg-surface-alt hover:text-ink disabled:opacity-50"
         >
           Anlegen
         </button>

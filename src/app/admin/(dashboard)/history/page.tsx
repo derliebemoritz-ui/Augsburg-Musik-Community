@@ -26,18 +26,18 @@ export default async function AdminHistoryPage({
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">Play-Historie</h1>
+        <h1 className="text-2xl font-semibold text-ink">Play-Historie</h1>
         <a
           href="/api/admin/history/csv"
-          className="rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:border-cyan-600"
+          className="border border-line bg-surface px-4 py-2 text-sm font-medium text-ink hover:border-cyan"
         >
           Als CSV exportieren
         </a>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-neutral-300 bg-white">
+      <div className="overflow-hidden border border-line bg-surface">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50 text-xs uppercase tracking-wide text-neutral-500">
+          <thead className="border-b border-line bg-surface-alt text-xs uppercase tracking-wide text-ink-muted">
             <tr>
               <th className="px-4 py-3">Datum &amp; Uhrzeit</th>
               <th className="px-4 py-3">Künstler:in</th>
@@ -45,32 +45,32 @@ export default async function AdminHistoryPage({
               <th className="px-4 py-3">Genre</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100">
+          <tbody className="divide-y divide-line">
             {items.map((item) => (
               <tr key={item.id}>
-                <td className="px-4 py-3 text-neutral-500">{formatDateTime(item.scheduledStart)}</td>
+                <td className="px-4 py-3 text-ink-muted">{formatDateTime(item.scheduledStart)}</td>
                 <td className="px-4 py-3">{item.track.artist.name}</td>
                 <td className="px-4 py-3">{item.track.title}</td>
-                <td className="px-4 py-3 text-neutral-500">{item.block.genre.name}</td>
+                <td className="px-4 py-3 text-ink-muted">{item.block.genre.name}</td>
               </tr>
             ))}
           </tbody>
         </table>
         {items.length === 0 && (
-          <p className="p-8 text-center text-sm text-neutral-500">Noch keine Wiedergaben.</p>
+          <p className="p-8 text-center text-sm text-ink-muted">Noch keine Wiedergaben.</p>
         )}
       </div>
 
       <div className="mt-4 flex justify-between text-sm">
         {page > 1 ? (
-          <Link href={`/admin/history?page=${page - 1}`} className="text-cyan-700 hover:underline">
+          <Link href={`/admin/history?page=${page - 1}`} className="text-cyan hover:underline">
             ← Neuer
           </Link>
         ) : (
           <span />
         )}
         {items.length === PAGE_SIZE && (
-          <Link href={`/admin/history?page=${page + 1}`} className="text-cyan-700 hover:underline">
+          <Link href={`/admin/history?page=${page + 1}`} className="text-cyan hover:underline">
             Älter →
           </Link>
         )}

@@ -29,7 +29,7 @@ export default async function EditTrackPage({ params }: { params: Promise<{ id: 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">{track.title} bearbeiten</h1>
+        <h1 className="text-2xl font-semibold text-ink">{track.title} bearbeiten</h1>
         <DeleteEntityButton
           onDelete={deleteTrack.bind(null, id)}
           confirmText={`"${track.title}" wirklich löschen? Das ist nur möglich, wenn der Track noch nie im Sendeplan war.`}
@@ -37,26 +37,26 @@ export default async function EditTrackPage({ params }: { params: Promise<{ id: 
         />
       </div>
 
-      <div className="mb-6 grid max-w-xl grid-cols-2 gap-4 rounded-lg border border-neutral-300 bg-white p-4 text-sm sm:grid-cols-4">
+      <div className="mb-6 grid max-w-xl grid-cols-2 gap-4 border border-line bg-surface p-4 text-sm sm:grid-cols-4">
         <div>
-          <div className="text-neutral-500">Plays gesamt</div>
-          <div className="font-semibold text-neutral-900">{stats.totalPlays}</div>
+          <div className="text-ink-muted">Plays gesamt</div>
+          <div className="font-semibold text-ink">{stats.totalPlays}</div>
         </div>
         <div>
-          <div className="text-neutral-500">Skip-Quote</div>
-          <div className="font-semibold text-neutral-900">
+          <div className="text-ink-muted">Skip-Quote</div>
+          <div className="font-semibold text-ink">
             {stats.skipRate === null ? "–" : `${Math.round(stats.skipRate * 100)}%`}
           </div>
         </div>
         <div>
-          <div className="text-neutral-500">Completion-Quote</div>
-          <div className="font-semibold text-neutral-900">
+          <div className="text-ink-muted">Completion-Quote</div>
+          <div className="font-semibold text-ink">
             {stats.completionRate === null ? "–" : `${Math.round(stats.completionRate * 100)}%`}
           </div>
         </div>
         <div>
-          <div className="text-neutral-500">Aktuelles Gewicht</div>
-          <div className="font-semibold text-neutral-900">{stats.effectiveWeight.toFixed(2)}</div>
+          <div className="text-ink-muted">Aktuelles Gewicht</div>
+          <div className="font-semibold text-ink">{stats.effectiveWeight.toFixed(2)}</div>
         </div>
       </div>
 

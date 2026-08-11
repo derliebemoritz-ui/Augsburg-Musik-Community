@@ -13,9 +13,9 @@ export default async function NewTrackPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold text-neutral-900">Track hochladen</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-ink">Track hochladen</h1>
       {artists.length === 0 || genres.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-ink-muted">
           Bitte zuerst mindestens eine Künstler:in (mit Album) und ein Genre anlegen.
         </p>
       ) : (

@@ -1,27 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceMono = Space_Mono({
+  variable: "--font-mono",
+  weight: ["400", "700"],
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Stadtradio – lokale Musik aus Augsburg",
-  description:
-    "Ein kuratiertes Webradio für Musik lokaler Künstler:innen aus Augsburg.",
+  title: "Augsburg Musik Community",
+  description: "Augsburg Musik Community",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="de" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-neutral-100 text-neutral-900">{children}</body>
+    <html lang="de" className={`${spaceGrotesk.variable} ${spaceMono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-page text-ink font-sans">{children}</body>
     </html>
   );
 }

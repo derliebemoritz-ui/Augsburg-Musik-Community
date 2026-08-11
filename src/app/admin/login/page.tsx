@@ -34,16 +34,16 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-page px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-lg border border-neutral-300 bg-white p-8 shadow-sm"
+        className="w-full max-w-sm border border-line bg-surface p-8"
       >
-        <h1 className="mb-1 text-xl font-semibold text-neutral-900">Admin-Login</h1>
-        <p className="mb-6 text-sm text-neutral-500">
+        <h1 className="mb-1 text-xl font-semibold text-ink">Admin-Login</h1>
+        <p className="mb-6 text-sm text-ink-muted">
           Zugang zum Verwaltungsbereich des Webradios.
         </p>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="password">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="password">
           Passwort
         </label>
         <input
@@ -52,13 +52,13 @@ export default function AdminLoginPage() {
           autoFocus
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mb-4 w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="mb-4 w-full border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
         {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
         <button
           type="submit"
           disabled={loading || password.length === 0}
-          className="w-full rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:opacity-50"
+          className="w-full bg-ink px-4 py-2 text-sm font-medium text-page transition hover:bg-surface-alt hover:text-ink disabled:opacity-50"
         >
           {loading ? "Anmelden…" : "Anmelden"}
         </button>

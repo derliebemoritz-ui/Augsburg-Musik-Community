@@ -26,17 +26,14 @@ export default async function HomePage() {
   return (
     <div className="flex-1 px-4 py-10">
       <header className="mx-auto mb-10 max-w-4xl text-center">
-        <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-          Stadtradio Augsburg
+        <h1 className="text-2xl font-bold tracking-tight text-ink uppercase">
+          Augsburg Musik Community
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          Kuratierte Musik lokaler Künstler:innen, rund um die Uhr.
-        </p>
-        <div className="mx-auto mt-4 flex h-[3px] w-24 overflow-hidden rounded-full">
-          <span className="flex-1 bg-[#00aeef]" />
-          <span className="flex-1 bg-[#e6007e]" />
-          <span className="flex-1 bg-[#fff200]" />
-          <span className="flex-1 bg-neutral-900" />
+        <div className="mx-auto mt-4 flex h-[3px] w-24">
+          <span className="flex-1 bg-cyan" />
+          <span className="flex-1 bg-magenta" />
+          <span className="flex-1 bg-yellow" />
+          <span className="flex-1 bg-ink" />
         </div>
       </header>
 
@@ -50,7 +47,7 @@ export default async function HomePage() {
         />
       </div>
 
-      <footer className="mx-auto mt-16 max-w-4xl text-center text-xs text-neutral-400">
+      <footer className="mx-auto mt-16 max-w-4xl text-center text-xs text-ink-muted">
         <a href="/admin" className="hover:underline">
           Admin
         </a>

@@ -13,18 +13,18 @@ export default async function AdminTracksPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">Tracks</h1>
+        <h1 className="text-2xl font-semibold text-ink">Tracks</h1>
         <Link
           href="/admin/tracks/new"
-          className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+          className="bg-ink px-4 py-2 text-sm font-medium text-page hover:bg-surface-alt hover:text-ink"
         >
           + Track hochladen
         </Link>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-neutral-300 bg-white">
+      <div className="overflow-x-auto border border-line bg-surface">
         <table className="w-full min-w-[900px] text-left text-sm">
-          <thead className="border-b border-neutral-200 bg-neutral-50 text-xs uppercase tracking-wide text-neutral-500">
+          <thead className="border-b border-line bg-surface-alt text-xs uppercase tracking-wide text-ink-muted">
             <tr>
               <th className="px-4 py-3">Titel</th>
               <th className="px-4 py-3">Künstler:in</th>
@@ -37,7 +37,7 @@ export default async function AdminTracksPage() {
               <th className="px-4 py-3">Aktiv</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-100">
+          <tbody className="divide-y divide-line">
             {tracks.map((track) => (
               <TrackRow
                 key={track.id}
@@ -55,7 +55,7 @@ export default async function AdminTracksPage() {
           </tbody>
         </table>
         {tracks.length === 0 && (
-          <p className="p-8 text-center text-sm text-neutral-500">Noch keine Tracks hochgeladen.</p>
+          <p className="p-8 text-center text-sm text-ink-muted">Noch keine Tracks hochgeladen.</p>
         )}
       </div>
     </div>

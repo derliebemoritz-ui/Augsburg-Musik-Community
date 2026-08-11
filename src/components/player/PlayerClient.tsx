@@ -118,16 +118,17 @@ export default function PlayerClient({
     }
   }, [refreshCurrent, serverNow]);
 
-  function handlePlayPause() {
+  function handlePlay() {
+    // Play (egal ob Erststart oder nach Pause) steigt immer an der aktuell
+    // live laufenden Stelle ein - wie echtes Radio.
+    playLive();
+  }
+
+  function handlePause() {
     const audio = audioRef.current;
     if (!audio) return;
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-      return;
-    }
-    // Wieder-Einsteigen folgt derselben Live-Radio-Logik wie der erste Start.
-    playLive();
+    audio.pause();
+    setIsPlaying(false);
   }
 
   function handleSkip() {
@@ -230,8 +231,8 @@ export default function PlayerClient({
 
   if (!current) {
     return (
-      <div className="mx-auto max-w-xl rounded-lg border border-neutral-300 bg-white p-8 text-center">
-        <p className="text-neutral-600">
+      <div className="mx-auto max-w-xl border border-line bg-surface p-8 text-center">
+        <p className="text-ink-muted">
           Gerade läuft kein Programm. Das kann daran liegen, dass noch keine Musik hochgeladen
           wurde. Bitte später noch einmal vorbeischauen.
         </p>
@@ -242,25 +243,25 @@ export default function PlayerClient({
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_2fr_1fr]">
       <aside className="order-2 lg:order-1">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+        <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-ink-muted">
           Zuletzt gespielt
         </h2>
-        <ul className="space-y-2 border-l-2 border-cyan-600/40 pl-4 text-sm">
+        <ul className="space-y-2 border-l-2 border-cyan pl-4 text-sm">
           {history.slice(0, 15).map((entry, i) => (
-            <li key={`${entry.scheduleItemId}-${i}`} className="text-neutral-600">
-              <span className="text-neutral-400">{formatTime(entry.scheduledStart)}</span>{" "}
+            <li key={`${entry.scheduleItemId}-${i}`} className="text-ink-muted">
+              <span className="font-mono text-ink">{formatTime(entry.scheduledStart)}</span>{" "}
               {entry.artistName} – {entry.title}
             </li>
           ))}
-          {history.length === 0 && <li className="text-neutral-400">Noch keine Historie.</li>}
+          {history.length === 0 && <li className="text-ink-muted">Noch keine Historie.</li>}
         </ul>
       </aside>
 
       <section className="order-1 lg:order-2">
         <p className="mb-3 flex justify-center">
-          <span className="rounded-full border border-[#fff200] bg-white px-3 py-1 text-sm text-neutral-600 shadow-sm">
-            Jetzt: <span className="font-medium text-neutral-800">{current.genreName}</span> — bis{" "}
-            {formatTime(current.blockEndsAt)} Uhr
+          <span className="border border-yellow bg-surface px-3 py-1 text-sm text-ink-muted">
+            Jetzt: <span className="font-bold text-ink">{current.genreName}</span> — bis{" "}
+            <span className="font-mono text-ink">{formatTime(current.blockEndsAt)}</span> Uhr
           </span>
         </p>
 
@@ -269,43 +270,51 @@ export default function PlayerClient({
           <img
             src={current.albumArtworkUrl}
             alt={`Artwork: ${current.albumTitle}`}
-            className="mx-auto mb-4 aspect-square w-full max-w-md rounded-lg border border-neutral-300 object-cover shadow-sm"
+            className="mx-auto mb-4 aspect-square w-full max-w-md border border-line object-cover"
           />
         ) : (
-          <div className="mx-auto mb-4 flex aspect-square w-full max-w-md items-center justify-center rounded-lg border border-neutral-300 bg-neutral-200 text-neutral-400 shadow-sm">
+          <div className="mx-auto mb-4 flex aspect-square w-full max-w-md items-center justify-center border border-line bg-surface-alt text-ink-muted">
             Kein Artwork
           </div>
         )}
 
-        <div className="mx-auto max-w-md rounded-lg border border-neutral-300 bg-white p-4">
+        <div className="mx-auto max-w-md border border-line bg-surface p-4">
           <div className="mb-3 flex items-center gap-3">
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full bg-neutral-200">
+            <div className="h-12 w-12 shrink-0 overflow-hidden border border-line bg-surface-alt">
               {current.artistPhotoUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={current.artistPhotoUrl} alt="" className="h-full w-full object-cover" />
               )}
             </div>
             <div className="min-w-0">
-              <div className="truncate font-semibold text-neutral-900">{current.title}</div>
-              <div className="truncate text-sm text-neutral-500">
+              <div className="truncate font-bold text-ink">{current.title}</div>
+              <div className="truncate text-sm text-ink-muted">
                 {current.artistName} · {current.albumTitle}
               </div>
             </div>
           </div>
 
-          {loadError && <p className="mb-2 text-xs text-red-600">{loadError}</p>}
+          {loadError && <p className="mb-2 text-xs text-magenta">{loadError}</p>}
 
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-3">
             <button
-              onClick={handlePlayPause}
-              className="rounded-full bg-neutral-900 px-6 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+              onClick={handlePlay}
+              disabled={isPlaying}
+              className="border-2 border-ink bg-ink px-5 py-2 text-sm font-bold uppercase tracking-wide text-page hover:bg-surface-alt hover:text-ink disabled:opacity-40"
             >
-              {isPlaying ? "Pause" : hasStarted ? "Weiter" : "Play"}
+              {hasStarted ? "Weiter" : "Play"}
+            </button>
+            <button
+              onClick={handlePause}
+              disabled={!isPlaying}
+              className="border-2 border-ink px-5 py-2 text-sm font-bold uppercase tracking-wide text-ink hover:bg-ink hover:text-page disabled:opacity-40"
+            >
+              Pause
             </button>
             <button
               onClick={handleSkip}
               disabled={!isPlaying && !hasStarted}
-              className="rounded-full border border-neutral-300 px-6 py-2 text-sm font-medium text-neutral-700 hover:border-cyan-600 disabled:opacity-40"
+              className="border-2 border-line px-5 py-2 text-sm font-bold uppercase tracking-wide text-ink-muted hover:border-cyan hover:text-ink disabled:opacity-40"
             >
               Skip
             </button>
@@ -325,7 +334,7 @@ export default function PlayerClient({
             href={current.artistMusicLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded border-2 border-[#e6007e] px-4 py-2 text-center text-sm font-medium text-neutral-800 hover:bg-neutral-50"
+            className="border-2 border-magenta bg-surface px-4 py-2 text-center text-sm font-bold uppercase tracking-wide text-ink hover:bg-surface-alt"
           >
             Hier geht&apos;s zur Musik
           </a>
@@ -334,15 +343,20 @@ export default function PlayerClient({
               href={donationUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded border-2 border-[#00aeef] px-4 py-2 text-center text-sm font-medium text-neutral-800 hover:bg-neutral-50"
+              className="border-2 border-cyan bg-surface px-4 py-2 text-center hover:bg-surface-alt"
             >
-              Spenden für die Musiker*innen
+              <span className="block text-sm font-bold uppercase tracking-wide text-ink">
+                Spenden
+              </span>
+              <span className="block text-xs text-ink-muted">
+                Künstler*innen und Projekt unterstützen
+              </span>
             </a>
           )}
         </div>
 
         {current.artistBio && (
-          <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-neutral-600">
+          <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-ink-muted">
             {current.artistBio}
           </p>
         )}

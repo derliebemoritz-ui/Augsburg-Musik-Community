@@ -13,10 +13,10 @@ export default async function AdminArtistsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">Künstler:innen</h1>
+        <h1 className="text-2xl font-semibold text-ink">Künstler:innen</h1>
         <Link
           href="/admin/artists/new"
-          className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+          className="bg-ink px-4 py-2 text-sm font-medium text-page hover:bg-surface-alt hover:text-ink"
         >
           + Neu anlegen
         </Link>
@@ -27,9 +27,9 @@ export default async function AdminArtistsPage() {
           <li key={artist.id}>
             <Link
               href={`/admin/artists/${artist.id}`}
-              className="flex items-center gap-3 rounded-lg border border-neutral-300 bg-white p-3 hover:border-cyan-600"
+              className="flex items-center gap-3 border border-line bg-surface p-3 hover:border-cyan"
             >
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full bg-neutral-200">
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden bg-surface-alt">
                 {artist.photoPath && (
                   <Image
                     src={storage.getPublicUrl(artist.photoPath)}
@@ -40,8 +40,8 @@ export default async function AdminArtistsPage() {
                 )}
               </div>
               <div className="min-w-0">
-                <div className="truncate font-medium text-neutral-900">{artist.name}</div>
-                <div className="text-xs text-neutral-500">
+                <div className="truncate font-medium text-ink">{artist.name}</div>
+                <div className="text-xs text-ink-muted">
                   {artist._count.albums} Album/Alben · {artist._count.tracks} Track(s)
                 </div>
               </div>
@@ -49,7 +49,7 @@ export default async function AdminArtistsPage() {
           </li>
         ))}
         {artists.length === 0 && (
-          <li className="col-span-full rounded-lg border border-dashed border-neutral-300 p-8 text-center text-sm text-neutral-500">
+          <li className="col-span-full border border-dashed border-line p-8 text-center text-sm text-ink-muted">
             Noch keine Künstler:innen angelegt.
           </li>
         )}

@@ -12,9 +12,9 @@ export default async function NewAlbumPage({
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold text-neutral-900">Neues Album anlegen</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-ink">Neues Album anlegen</h1>
       {artists.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-ink-muted">
           Bitte zuerst eine Künstler:in anlegen.
         </p>
       ) : (

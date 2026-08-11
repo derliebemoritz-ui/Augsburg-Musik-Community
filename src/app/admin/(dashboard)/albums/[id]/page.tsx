@@ -16,7 +16,7 @@ export default async function EditAlbumPage({ params }: { params: Promise<{ id: 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">{album.title} bearbeiten</h1>
+        <h1 className="text-2xl font-semibold text-ink">{album.title} bearbeiten</h1>
         <DeleteEntityButton
           onDelete={deleteAlbum.bind(null, id)}
           confirmText={`"${album.title}" wirklich löschen?`}
@@ -32,15 +32,15 @@ export default async function EditAlbumPage({ params }: { params: Promise<{ id: 
         submitLabel="Speichern"
       />
 
-      <div className="mt-10 max-w-xl border-t border-neutral-200 pt-6">
-        <h2 className="mb-2 text-sm font-semibold text-neutral-700">Tracks</h2>
+      <div className="mt-10 max-w-xl border-t border-line pt-6">
+        <h2 className="mb-2 text-sm font-semibold text-ink-muted">Tracks</h2>
         {album.tracks.length === 0 ? (
-          <p className="text-sm text-neutral-500">Noch keine Tracks.</p>
+          <p className="text-sm text-ink-muted">Noch keine Tracks.</p>
         ) : (
           <ul className="space-y-1 text-sm">
             {album.tracks.map((track) => (
               <li key={track.id}>
-                <Link href={`/admin/tracks/${track.id}`} className="text-cyan-700 hover:underline">
+                <Link href={`/admin/tracks/${track.id}`} className="text-cyan hover:underline">
                   {track.title}
                 </Link>
               </li>

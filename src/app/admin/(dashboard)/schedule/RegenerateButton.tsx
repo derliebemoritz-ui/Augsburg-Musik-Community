@@ -28,7 +28,7 @@ export default function RegenerateButton({ hasTomorrowSchedule }: { hasTomorrowS
     <button
       onClick={handleClick}
       disabled={isPending}
-      className="rounded border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:border-cyan-600 disabled:opacity-50"
+      className="border border-line bg-surface px-4 py-2 text-sm font-medium text-ink hover:border-cyan disabled:opacity-50"
     >
       {isPending ? "Wird generiert…" : "Plan für morgen neu generieren"}
     </button>

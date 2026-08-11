@@ -17,7 +17,7 @@ export default function ArtistForm({
   return (
     <form action={action} className="max-w-xl space-y-5">
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="name">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="name">
           Name
         </label>
         <input
@@ -25,12 +25,12 @@ export default function ArtistForm({
           name="name"
           required
           defaultValue={defaultValues?.name}
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="bio">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="bio">
           Bio-Text
         </label>
         <textarea
@@ -38,12 +38,12 @@ export default function ArtistForm({
           name="bio"
           rows={5}
           defaultValue={defaultValues?.bio}
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="musicLink">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="musicLink">
           Musik-Link (&bdquo;Hier geht&apos;s zur Musik&ldquo; - Spotify, Bandcamp, Website, …)
         </label>
         <input
@@ -53,16 +53,16 @@ export default function ArtistForm({
           required
           defaultValue={defaultValues?.musicLink}
           placeholder="https://…"
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="photo">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="photo">
           Künstler:innenfoto
         </label>
         {photoPath && (
-          <div className="relative mb-2 h-24 w-24 overflow-hidden rounded-full bg-neutral-200">
+          <div className="relative mb-2 h-24 w-24 overflow-hidden bg-surface-alt">
             <Image src={storage.getPublicUrl(photoPath)} alt="" fill className="object-cover" />
           </div>
         )}
@@ -77,7 +77,7 @@ export default function ArtistForm({
 
       <button
         type="submit"
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+        className="bg-ink px-4 py-2 text-sm font-medium text-page hover:bg-surface-alt hover:text-ink"
       >
         {submitLabel}
       </button>

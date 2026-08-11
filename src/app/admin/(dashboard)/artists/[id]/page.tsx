@@ -16,7 +16,7 @@ export default async function EditArtistPage({ params }: { params: Promise<{ id:
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-neutral-900">{artist.name} bearbeiten</h1>
+        <h1 className="text-2xl font-semibold text-ink">{artist.name} bearbeiten</h1>
         <DeleteEntityButton
           onDelete={deleteArtist.bind(null, id)}
           confirmText={`"${artist.name}" wirklich löschen?`}
@@ -31,15 +31,15 @@ export default async function EditArtistPage({ params }: { params: Promise<{ id:
         submitLabel="Speichern"
       />
 
-      <div className="mt-10 max-w-xl border-t border-neutral-200 pt-6">
-        <h2 className="mb-2 text-sm font-semibold text-neutral-700">Alben</h2>
+      <div className="mt-10 max-w-xl border-t border-line pt-6">
+        <h2 className="mb-2 text-sm font-semibold text-ink-muted">Alben</h2>
         {artist.albums.length === 0 ? (
-          <p className="text-sm text-neutral-500">Noch keine Alben.</p>
+          <p className="text-sm text-ink-muted">Noch keine Alben.</p>
         ) : (
           <ul className="space-y-1 text-sm">
             {artist.albums.map((album) => (
               <li key={album.id}>
-                <Link href={`/admin/albums/${album.id}`} className="text-cyan-700 hover:underline">
+                <Link href={`/admin/albums/${album.id}`} className="text-cyan hover:underline">
                   {album.title}
                 </Link>
               </li>
@@ -48,7 +48,7 @@ export default async function EditArtistPage({ params }: { params: Promise<{ id:
         )}
         <Link
           href={`/admin/albums/new?artistId=${artist.id}`}
-          className="mt-2 inline-block text-sm text-cyan-700 hover:underline"
+          className="mt-2 inline-block text-sm text-cyan hover:underline"
         >
           + Album anlegen
         </Link>

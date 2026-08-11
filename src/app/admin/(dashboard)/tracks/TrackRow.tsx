@@ -49,9 +49,9 @@ export default function TrackRow({ track, stats }: { track: TrackSummary; stats:
   }
 
   return (
-    <tr className={active ? "" : "bg-neutral-50 text-neutral-400"}>
+    <tr className={active ? "" : "bg-surface-alt text-ink-muted"}>
       <td className="px-4 py-3">
-        <Link href={`/admin/tracks/${track.id}`} className="font-medium text-neutral-900 hover:text-cyan-700 hover:underline">
+        <Link href={`/admin/tracks/${track.id}`} className="font-medium text-ink hover:text-cyan hover:underline">
           {track.title}
         </Link>
       </td>
@@ -64,7 +64,7 @@ export default function TrackRow({ track, stats }: { track: TrackSummary; stats:
       </td>
       <td className="px-4 py-3">
         {formatPercent(stats.completionRate)}
-        {stats.isTopCompletionRate && <span className="ml-1 text-xs text-cyan-600">▲1.1x</span>}
+        {stats.isTopCompletionRate && <span className="ml-1 text-xs text-cyan">▲1.1x</span>}
       </td>
       <td className="px-4 py-3">
         <input
@@ -74,7 +74,7 @@ export default function TrackRow({ track, stats }: { track: TrackSummary; stats:
           max="5"
           defaultValue={multiplier}
           onBlur={handleMultiplierBlur}
-          className="w-16 rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="w-16 border border-line px-2 py-1 text-sm"
         />
       </td>
       <td className="px-4 py-3 font-mono text-xs">{stats.effectiveWeight.toFixed(2)}</td>
@@ -82,8 +82,8 @@ export default function TrackRow({ track, stats }: { track: TrackSummary; stats:
         <button
           onClick={handleToggleActive}
           disabled={isPending}
-          className={`rounded px-2 py-1 text-xs font-medium ${
-            active ? "bg-green-100 text-green-800" : "bg-neutral-200 text-neutral-600"
+          className={`border px-2 py-1 text-xs font-medium ${
+            active ? "border-cyan text-ink" : "border-line text-ink-muted"
           }`}
         >
           {active ? "Aktiv" : "Inaktiv"}

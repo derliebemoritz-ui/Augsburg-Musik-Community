@@ -9,8 +9,8 @@ export default async function AdminGenresPage() {
 
   return (
     <div>
-      <h1 className="mb-1 text-2xl font-semibold text-neutral-900">Genres</h1>
-      <p className="mb-6 text-sm text-neutral-500">
+      <h1 className="mb-1 text-2xl font-semibold text-ink">Genres</h1>
+      <p className="mb-6 text-sm text-ink-muted">
         Ein Genre pro 2-Stunden-Sendeblock. Umbenennen wirkt sich sofort überall aus; Löschen
         ist nur möglich, wenn keine Tracks mehr zugeordnet sind.
       </p>

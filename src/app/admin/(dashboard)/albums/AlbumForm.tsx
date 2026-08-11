@@ -19,7 +19,7 @@ export default function AlbumForm({
   return (
     <form action={action} className="max-w-xl space-y-5">
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="title">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="title">
           Titel
         </label>
         <input
@@ -27,12 +27,12 @@ export default function AlbumForm({
           name="title"
           required
           defaultValue={defaultValues?.title}
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="artistId">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="artistId">
           Künstler:in
         </label>
         <select
@@ -40,7 +40,7 @@ export default function AlbumForm({
           name="artistId"
           required
           defaultValue={defaultValues?.artistId}
-          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line bg-surface px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         >
           <option value="" disabled>
             Bitte wählen…
@@ -54,11 +54,11 @@ export default function AlbumForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="artwork">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="artwork">
           Artwork
         </label>
         {artworkPath && (
-          <div className="relative mb-2 h-24 w-24 overflow-hidden rounded bg-neutral-200">
+          <div className="relative mb-2 h-24 w-24 overflow-hidden bg-surface-alt">
             <Image src={storage.getPublicUrl(artworkPath)} alt="" fill className="object-cover" />
           </div>
         )}
@@ -73,7 +73,7 @@ export default function AlbumForm({
 
       <button
         type="submit"
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+        className="bg-ink px-4 py-2 text-sm font-medium text-page hover:bg-surface-alt hover:text-ink"
       >
         {submitLabel}
       </button>

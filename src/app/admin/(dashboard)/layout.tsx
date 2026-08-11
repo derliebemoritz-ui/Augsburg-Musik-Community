@@ -18,17 +18,17 @@ const NAV_ITEMS = [
 
 export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-neutral-100">
-      <header className="border-b border-neutral-300 bg-white">
+    <div className="min-h-screen bg-page">
+      <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-6">
-            <span className="font-semibold text-neutral-900">Radio-Verwaltung</span>
+            <span className="font-semibold text-ink">Radio-Verwaltung</span>
             <nav className="flex flex-wrap gap-4 text-sm">
               {NAV_ITEMS.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-neutral-600 hover:text-cyan-700 hover:underline"
+                  className="text-ink-muted hover:text-cyan hover:underline"
                 >
                   {item.label}
                 </Link>
@@ -36,7 +36,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-sm text-neutral-500 hover:underline">
+            <Link href="/" className="text-sm text-ink-muted hover:underline">
               Zur Radio-Seite
             </Link>
             <LogoutButton />

@@ -34,7 +34,7 @@ export default function TrackForm({
   return (
     <form action={action} className="max-w-xl space-y-5">
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="title">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="title">
           Titel
         </label>
         <input
@@ -42,12 +42,12 @@ export default function TrackForm({
           name="title"
           required
           defaultValue={defaultValues?.title}
-          className="w-full rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="artistId">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="artistId">
           Künstler:in
         </label>
         <select
@@ -56,7 +56,7 @@ export default function TrackForm({
           required
           value={artistId}
           onChange={(e) => setArtistId(e.target.value)}
-          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line bg-surface px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         >
           <option value="" disabled>
             Bitte wählen…
@@ -70,7 +70,7 @@ export default function TrackForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="albumId">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="albumId">
           Album
         </label>
         <select
@@ -79,7 +79,7 @@ export default function TrackForm({
           required
           defaultValue={defaultValues?.albumId}
           disabled={!selectedArtist}
-          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600 disabled:bg-neutral-100"
+          className="w-full border border-line bg-surface px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan disabled:bg-surface-alt"
         >
           <option value="" disabled>
             {selectedArtist ? "Bitte wählen…" : "Erst Künstler:in wählen"}
@@ -91,14 +91,14 @@ export default function TrackForm({
           ))}
         </select>
         {selectedArtist && selectedArtist.albums.length === 0 && (
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-ink-muted">
             Diese Künstler:in hat noch kein Album - bitte zuerst eines anlegen.
           </p>
         )}
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="genreId">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="genreId">
           Genre
         </label>
         <select
@@ -106,7 +106,7 @@ export default function TrackForm({
           name="genreId"
           required
           defaultValue={defaultValues?.genreId}
-          className="w-full rounded border border-neutral-300 bg-white px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-full border border-line bg-surface px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         >
           <option value="" disabled>
             Bitte wählen…
@@ -120,7 +120,7 @@ export default function TrackForm({
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="sanctionMultiplier">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="sanctionMultiplier">
           Sanktions-Multiplikator
         </label>
         <input
@@ -131,13 +131,13 @@ export default function TrackForm({
           min="0"
           max="5"
           defaultValue={defaultValues?.sanctionMultiplier ?? 1.0}
-          className="w-24 rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="w-24 border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
-        <p className="mt-1 text-xs text-neutral-500">Default 1.0. Kleiner als 1 = seltener spielen.</p>
+        <p className="mt-1 text-xs text-ink-muted">Default 1.0. Kleiner als 1 = seltener spielen.</p>
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="audio">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="audio">
           Audiodatei {audioUrl ? "(ersetzen, optional)" : "(MP3, WAV oder OGG, max. 50 MB)"}
         </label>
         {audioUrl && <audio controls src={audioUrl} className="mb-2 w-full" />}
@@ -151,9 +151,9 @@ export default function TrackForm({
         />
       </div>
 
-      <fieldset className="rounded border border-neutral-300 p-4">
-        <legend className="px-1 text-sm font-medium text-neutral-700">Rechte-Einverständnis</legend>
-        <label className="mb-3 flex items-center gap-2 text-sm text-neutral-800">
+      <fieldset className="border border-line p-4">
+        <legend className="px-1 text-sm font-medium text-ink-muted">Rechte-Einverständnis</legend>
+        <label className="mb-3 flex items-center gap-2 text-sm text-ink">
           <input
             type="checkbox"
             name="consentGiven"
@@ -163,7 +163,7 @@ export default function TrackForm({
           />
           Einverständnis der Künstler:in liegt vor
         </label>
-        <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="consentDate">
+        <label className="mb-1 block text-sm font-medium text-ink-muted" htmlFor="consentDate">
           Datum des Einverständnisses
         </label>
         <input
@@ -172,13 +172,13 @@ export default function TrackForm({
           type="date"
           required
           defaultValue={defaultValues?.consentDate}
-          className="rounded border border-neutral-300 px-3 py-2 text-sm focus:border-cyan-600 focus:outline-none focus:ring-1 focus:ring-cyan-600"
+          className="border border-line px-3 py-2 text-sm focus:border-cyan focus:outline-none focus:ring-1 focus:ring-cyan"
         />
       </fieldset>
 
       <button
         type="submit"
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+        className="bg-ink px-4 py-2 text-sm font-medium text-page hover:bg-surface-alt hover:text-ink"
       >
         {submitLabel}
       </button>
