@@ -76,7 +76,8 @@ function ScheduleBlockList({ blocks }: { blocks: BlockWithItems[] }) {
             {block.items.map((item) => (
               <li key={item.id} className="flex justify-between gap-4">
                 <span>
-                  {item.track.title} — {item.track.artist.name}
+                  {item.trackTitle} — {item.artistName}
+                  {!item.trackId && <span className="ml-2 text-xs text-ink-muted">(gelöscht)</span>}
                 </span>
                 <span className="shrink-0 text-ink-muted">{formatTime(item.scheduledStart)}</span>
               </li>

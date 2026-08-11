@@ -27,17 +27,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Ungültige Daten." }, { status: 400 });
   }
 
-  const trackExists = await prisma.track.findUnique({
+  const track = await prisma.track.findUnique({
     where: { id: parsed.data.trackId },
-    select: { id: true },
+    include: { artist: true, album: true },
   });
-  if (!trackExists) {
+  if (!track) {
     return NextResponse.json({ error: "Unbekannter Track." }, { status: 404 });
   }
 
   await prisma.playEvent.create({
     data: {
-      trackId: parsed.data.trackId,
+      trackId: track.id,
+      trackTitle: track.title,
+      artistName: track.artist.name,
+      albumTitle: track.album.title,
       listenedSeconds: Math.round(parsed.data.listenedSeconds),
       completed: parsed.data.completed,
       skipped: parsed.data.skipped,

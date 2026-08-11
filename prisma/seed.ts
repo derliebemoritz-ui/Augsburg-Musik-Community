@@ -120,7 +120,7 @@ const ARTISTS: ArtistSeed[] = [
 
 async function seedArtists(genreIds: Record<string, string>) {
   const storage = getStorage();
-  const createdTracks: { id: string; title: string }[] = [];
+  const createdTracks: { id: string; title: string; artistName: string; albumTitle: string }[] = [];
 
   for (const artistSeed of ARTISTS) {
     const artistPhotoKey = `images/artists/${crypto.randomUUID()}.png`;
@@ -169,7 +169,12 @@ async function seedArtists(genreIds: Record<string, string>) {
           consentDate: daysAgo(trackSeed.uploadedDaysAgo),
         },
       });
-      createdTracks.push({ id: track.id, title: track.title });
+      createdTracks.push({
+        id: track.id,
+        title: track.title,
+        artistName: artist.name,
+        albumTitle: album.title,
+      });
     }
 
     console.log(`Artist "${artist.name}" mit Album "${album.title}" und ${artistSeed.tracks.length} Track(s) angelegt.`);
@@ -180,18 +185,32 @@ async function seedArtists(genreIds: Record<string, string>) {
 
 /** Erzeugt ein paar Beispiel-PlayEvents, damit Skip-/Completion-Quoten und
  *  die Top-30%-Rankings in der Admin-Statistik direkt etwas anzeigen. */
-async function seedPlayEvents(tracks: { id: string; title: string }[]) {
+async function seedPlayEvents(
+  tracks: { id: string; title: string; artistName: string; albumTitle: string }[]
+) {
   if (tracks.length < 2) return;
 
   const heavySkipTrack = tracks[0]; // wird viel geskippt -> Gewicht sollte sinken
   const heavyCompletionTrack = tracks[1]; // wird viel zu Ende gehört -> Gewicht sollte steigen
 
-  const events: { trackId: string; listenedSeconds: number; completed: boolean; skipped: boolean; playedAt: Date }[] = [];
+  const events: {
+    trackId: string;
+    trackTitle: string;
+    artistName: string;
+    albumTitle: string;
+    listenedSeconds: number;
+    completed: boolean;
+    skipped: boolean;
+    playedAt: Date;
+  }[] = [];
 
   for (let i = 0; i < 20; i++) {
     const skipped = i % 5 !== 0; // 80% Skip-Quote
     events.push({
       trackId: heavySkipTrack.id,
+      trackTitle: heavySkipTrack.title,
+      artistName: heavySkipTrack.artistName,
+      albumTitle: heavySkipTrack.albumTitle,
       listenedSeconds: skipped ? 15 : 150,
       completed: !skipped,
       skipped,
@@ -203,6 +222,9 @@ async function seedPlayEvents(tracks: { id: string; title: string }[]) {
     const completed = i % 5 !== 0; // 80% Completion-Quote
     events.push({
       trackId: heavyCompletionTrack.id,
+      trackTitle: heavyCompletionTrack.title,
+      artistName: heavyCompletionTrack.artistName,
+      albumTitle: heavyCompletionTrack.albumTitle,
       listenedSeconds: completed ? 200 : 30,
       completed,
       skipped: !completed,

@@ -105,10 +105,19 @@ model ScheduleBlock {
 
 // Ein einzelner Track-Slot im Sendeplan. Dient gleichzeitig als geplante UND
 // (nach dem tatsaechlichen Abspielen) als tatsaechliche Sende-Historie.
+//
+// trackTitle/artistName/albumTitle sind ein Snapshot zum Zeitpunkt der
+// Sendeplan-Erstellung. Tracks koennen im Admin-Bereich geloescht werden,
+// auch wenn sie bereits gespielt wurden (siehe Track.onDelete) - die
+// Historie bleibt dank dieser Textfelder trotzdem korrekt lesbar, auch
+// wenn `track`/`trackId` dann null sind.
 model ScheduleItem {
   id           String    @id @default(cuid())
   blockId      String
-  trackId      String
+  trackId      String?
+  trackTitle   String
+  artistName   String
+  albumTitle   String
   position     Int // Reihenfolge innerhalb des Blocks, 0-basiert
   scheduledStart DateTime
   scheduledEnd   DateTime
@@ -116,7 +125,7 @@ model ScheduleItem {
   createdAt      DateTime  @default(now())
 
   block ScheduleBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
-  track Track         @relation(fields: [trackId], references: [id], onDelete: Restrict)
+  track Track?        @relation(fields: [trackId], references: [id], onDelete: SetNull)
 
   @@unique([blockId, position])
   @@index([trackId])
@@ -125,16 +134,24 @@ model ScheduleItem {
 
 // Anonyme, aggregierte Wiedergabe-Statistik. Keine personenbezogenen Daten,
 // keine IP-Adressen, keine Cookies zur Wiedererkennung.
+//
+// trackTitle/artistName/albumTitle sind ein Snapshot zum Zeitpunkt des
+// Plays (siehe Kommentar bei ScheduleItem) - bleiben auch nach Loeschen
+// des Tracks erhalten, fliessen dann aber naturgemaess nicht mehr in die
+// Gewichtung noch existierender Tracks ein.
 model PlayEvent {
   id              String   @id @default(cuid())
-  trackId         String
+  trackId         String?
+  trackTitle      String
+  artistName      String
+  albumTitle      String
   playedAt        DateTime @default(now())
   listenedSeconds Int
   completed       Boolean // true = komplett zu Ende gehoert
   skipped         Boolean // true = geskippt (lokal, betrifft nur die eigene Session)
   createdAt       DateTime @default(now())
 
-  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  track Track? @relation(fields: [trackId], references: [id], onDelete: SetNull)
 
   @@index([trackId])
   @@index([playedAt])

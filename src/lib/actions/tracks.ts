@@ -183,18 +183,22 @@ export async function setSanctionMultiplier(id: string, value: number): Promise<
   }
 }
 
+/**
+ * Löscht einen Track dauerhaft, inklusive Audiodatei. Das ist auch dann
+ * möglich, wenn der Track bereits im Sendeplan/in der Historie vorkam -
+ * dort bleiben Titel/Künstler:in/Album als Snapshot-Text erhalten (siehe
+ * ScheduleItem/PlayEvent im Schema), nur die Verknüpfung zum Track wird
+ * null. Zum vorübergehenden Entfernen aus der Rotation stattdessen den
+ * Aktiv/Inaktiv-Schalter benutzen.
+ */
 export async function deleteTrack(id: string): Promise<ActionResult> {
   try {
     await requireAuth();
-    const scheduledCount = await prisma.scheduleItem.count({ where: { trackId: id } });
-    if (scheduledCount > 0) {
-      throw new ActionError(
-        "Track kann nicht gelöscht werden: er ist bereits im Sendeplan (auch historisch) enthalten. Stattdessen auf inaktiv setzen."
-      );
-    }
     const track = await prisma.track.delete({ where: { id } });
     await deleteStoredFile(track.audioPath);
     revalidatePath("/admin/tracks");
+    revalidatePath("/admin/history");
+    revalidatePath("/admin/schedule");
     return ok(undefined);
   } catch (err) {
     return fail(err);

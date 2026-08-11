@@ -7,29 +7,36 @@ import type { Track } from "@/generated/prisma/client";
  *  anonymen PlayEvents. Wird sowohl bei der Sendeplan-Generierung als auch
  *  in der Admin-Statistik-Ansicht verwendet. */
 export async function computePlayStatsMap(): Promise<Map<string, PlayStats>> {
+  // trackId ist null bei PlayEvents zu inzwischen gelöschten Tracks - die
+  // fließen naturgemäß nicht mehr in die Gewichtung/Statistik noch
+  // existierender Tracks ein.
+  const trackIdNotNull = { trackId: { not: null } } as const;
   const [totals, skips, completions] = await Promise.all([
-    prisma.playEvent.groupBy({ by: ["trackId"], _count: { _all: true } }),
+    prisma.playEvent.groupBy({ by: ["trackId"], where: trackIdNotNull, _count: { _all: true } }),
     prisma.playEvent.groupBy({
       by: ["trackId"],
-      where: { skipped: true },
+      where: { ...trackIdNotNull, skipped: true },
       _count: { _all: true },
     }),
     prisma.playEvent.groupBy({
       by: ["trackId"],
-      where: { completed: true },
+      where: { ...trackIdNotNull, completed: true },
       _count: { _all: true },
     }),
   ]);
 
   const stats = new Map<string, PlayStats>();
   for (const row of totals) {
+    if (!row.trackId) continue;
     stats.set(row.trackId, { totalPlays: row._count._all, skips: 0, completions: 0 });
   }
   for (const row of skips) {
+    if (!row.trackId) continue;
     const entry = stats.get(row.trackId);
     if (entry) entry.skips = row._count._all;
   }
   for (const row of completions) {
+    if (!row.trackId) continue;
     const entry = stats.get(row.trackId);
     if (entry) entry.completions = row._count._all;
   }

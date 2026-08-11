@@ -49,8 +49,13 @@ export default async function AdminHistoryPage({
             {items.map((item) => (
               <tr key={item.id}>
                 <td className="px-4 py-3 text-ink-muted">{formatDateTime(item.scheduledStart)}</td>
-                <td className="px-4 py-3">{item.track.artist.name}</td>
-                <td className="px-4 py-3">{item.track.title}</td>
+                <td className="px-4 py-3">{item.artistName}</td>
+                <td className="px-4 py-3">
+                  {item.trackTitle}
+                  {!item.trackId && (
+                    <span className="ml-2 text-xs text-ink-muted">(gelöscht)</span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-ink-muted">{item.block.genre.name}</td>
               </tr>
             ))}

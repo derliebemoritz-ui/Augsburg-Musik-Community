@@ -7,7 +7,6 @@ export const runtime = "nodejs";
 export async function GET() {
   const items = await prisma.scheduleItem.findMany({
     where: { scheduledEnd: { lte: new Date() } },
-    include: { track: { include: { artist: true } } },
     orderBy: { scheduledStart: "desc" },
   });
 
@@ -18,8 +17,8 @@ export async function GET() {
       minute: "2-digit",
       timeZone: "Europe/Berlin",
     }),
-    item.track.artist.name,
-    item.track.title,
+    item.artistName,
+    item.trackTitle,
   ]);
 
   const csv = toCsv(["Datum", "Uhrzeit", "Künstler:in", "Titel"], rows);

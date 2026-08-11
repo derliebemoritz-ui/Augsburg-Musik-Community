@@ -181,6 +181,9 @@ export async function generateDaySchedule(serviceDate: Date): Promise<GenerateRe
           items: {
             create: block.items.map((item, position) => ({
               trackId: item.track.id,
+              trackTitle: item.track.title,
+              artistName: item.track.artist.name,
+              albumTitle: item.track.album.title,
               position,
               scheduledStart: item.scheduledStart,
               scheduledEnd: item.scheduledEnd,

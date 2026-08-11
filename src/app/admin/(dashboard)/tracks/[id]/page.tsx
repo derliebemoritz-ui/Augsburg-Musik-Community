@@ -12,13 +12,14 @@ function toDateInputValue(date: Date): string {
 
 export default async function EditTrackPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [track, artists, genres] = await Promise.all([
+  const [track, artists, genres, upcomingScheduleCount] = await Promise.all([
     prisma.track.findUnique({ where: { id } }),
     prisma.artist.findMany({
       orderBy: { name: "asc" },
       include: { albums: { orderBy: { title: "asc" } } },
     }),
     prisma.genre.findMany({ orderBy: { name: "asc" } }),
+    prisma.scheduleItem.count({ where: { trackId: id, scheduledStart: { gt: new Date() } } }),
   ]);
   if (!track) notFound();
 
@@ -32,7 +33,15 @@ export default async function EditTrackPage({ params }: { params: Promise<{ id: 
         <h1 className="text-2xl font-semibold text-ink">{track.title} bearbeiten</h1>
         <DeleteEntityButton
           onDelete={deleteTrack.bind(null, id)}
-          confirmText={`"${track.title}" wirklich löschen? Das ist nur möglich, wenn der Track noch nie im Sendeplan war.`}
+          confirmText={
+            `"${track.title}" wirklich endgültig löschen?\n\n` +
+            "Der Datenbank-Eintrag und die Audiodatei werden unwiderruflich entfernt. " +
+            "In der Play-Historie und Statistik bleiben Titel, Künstler:in und Album als Text erhalten." +
+            (upcomingScheduleCount > 0
+              ? `\n\nAchtung: Der Track ist noch ${upcomingScheduleCount}× im kommenden Sendeplan eingeplant - diese Slots werden beim Abspielen automatisch übersprungen.`
+              : "") +
+            "\n\nZum vorübergehenden Entfernen aus der Rotation reicht stattdessen \"Inaktiv\" schalten."
+          }
           redirectTo="/admin/tracks"
         />
       </div>

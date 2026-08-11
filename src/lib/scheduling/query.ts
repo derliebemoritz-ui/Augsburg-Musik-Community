@@ -23,7 +23,10 @@ export async function getCurrentScheduleItem(
 ): Promise<CurrentScheduleItem | null> {
   const findCurrent = () =>
     prisma.scheduleItem.findFirst({
-      where: { scheduledStart: { lte: now }, scheduledEnd: { gt: now } },
+      // trackId kann null sein, falls der Track inzwischen gelöscht wurde -
+      // ein solcher Slot ist nicht abspielbar und wird wie "kein Programm"
+      // behandelt (siehe README, Abschnitt Fehlerbehandlung).
+      where: { scheduledStart: { lte: now }, scheduledEnd: { gt: now }, trackId: { not: null } },
       include: trackInclude,
       orderBy: { scheduledStart: "desc" },
     });
@@ -53,10 +56,11 @@ export async function getCurrentScheduleItem(
   return item;
 }
 
-/** Nächste Einträge nach dem aktuellen Slot (für eine "Als nächstes"-Anzeige). */
+/** Nächste Einträge nach dem aktuellen Slot (für eine "Als nächstes"-Anzeige).
+ *  Slots mit inzwischen gelöschtem Track werden übersprungen (nicht abspielbar). */
 export async function getUpcomingItems(now: Date = new Date(), limit = 5) {
   return prisma.scheduleItem.findMany({
-    where: { scheduledStart: { gt: now } },
+    where: { scheduledStart: { gt: now }, trackId: { not: null } },
     include: trackInclude,
     orderBy: { scheduledStart: "asc" },
     take: limit,
